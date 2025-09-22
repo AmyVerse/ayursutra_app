@@ -1,4 +1,4 @@
-import 'package:ayursutra_app/home_screen.dart';
+import 'package:ayursutra_app/root.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -21,14 +21,14 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         scaffoldBackgroundColor: pureWhite,
         appBarTheme: const AppBarTheme(
-          color: pureWhite,
+          backgroundColor: pureWhite,
           elevation: 0,
           iconTheme: IconThemeData(color: secondaryDark),
           toolbarTextStyle: TextStyle(color: secondaryDark),
           titleTextStyle: TextStyle(color: secondaryDark),
         ),
       ),
-      home: const PatientDashboard(),
+      home: const RootPage(),
     );
   }
 }

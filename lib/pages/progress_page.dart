@@ -1,14 +1,14 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-class ProgressScreen extends StatefulWidget {
-  const ProgressScreen({super.key});
+class ProgressPage extends StatefulWidget {
+  const ProgressPage({super.key});
 
   @override
-  State<ProgressScreen> createState() => _ProgressScreenState();
+  State<ProgressPage> createState() => _ProgressPageState();
 }
 
-class _ProgressScreenState extends State<ProgressScreen> {
+class _ProgressPageState extends State<ProgressPage> {
   final Color primaryTeal = const Color(0xFF14B8A6);
   final Color secondaryDark = const Color(0xFF0F172A);
 
@@ -26,8 +26,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
+    return SafeArea(
+      child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,7 +47,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 IconButton(
                   onPressed: () {},
                   icon: const Icon(Icons.arrow_forward_ios, size: 20),
-                )
+                ),
               ],
             ),
             const SizedBox(height: 10),
@@ -105,8 +105,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                     maxX: 5,
                     minY: 0,
                     maxY: 100,
-                    gridData:
-                        FlGridData(show: true, drawVerticalLine: true),
+                    gridData: FlGridData(show: true, drawVerticalLine: true),
                     titlesData: FlTitlesData(
                       bottomTitles: AxisTitles(
                         sideTitles: SideTitles(
@@ -135,20 +134,25 @@ class _ProgressScreenState extends State<ProgressScreen> {
                           showTitles: true,
                           getTitlesWidget: (value, meta) {
                             if (value % 20 == 0) {
-                              return Text("${value.toInt()}%",
-                                  style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF0F172A)));
+                              return Text(
+                                "${value.toInt()}%",
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF0F172A),
+                                ),
+                              );
                             }
                             return const SizedBox.shrink();
                           },
                         ),
                       ),
                       topTitles: const AxisTitles(
-                          sideTitles: SideTitles(showTitles: false)),
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
                       rightTitles: const AxisTitles(
-                          sideTitles: SideTitles(showTitles: false)),
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
                     ),
                     borderData: FlBorderData(show: false),
                     lineBarsData: [
@@ -169,12 +173,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
                             end: Alignment.bottomCenter,
                           ),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
               ),
-            )
+            ),
+            const SizedBox(height: 100), // Extra space for floating nav
           ],
         ),
       ),
