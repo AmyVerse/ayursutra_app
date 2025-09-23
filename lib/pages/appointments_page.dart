@@ -1,5 +1,6 @@
 import 'package:ayursutra_app/theme/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class AppointmentsPage extends StatefulWidget {
   const AppointmentsPage({super.key});
@@ -10,18 +11,7 @@ class AppointmentsPage extends StatefulWidget {
 
 class _AppointmentsPageState extends State<AppointmentsPage> {
   DateTime _selectedDate = DateTime.now();
-  int _selectedTimeSlot = -1;
-
-  final List<String> _timeSlots = [
-    '09:00 AM',
-    '10:00 AM',
-    '11:00 AM',
-    '12:00 PM',
-    '02:00 PM',
-    '03:00 PM',
-    '04:00 PM',
-    '05:00 PM',
-  ];
+  // Removed time slots, will use calendar only
 
   final List<Map<String, dynamic>> _appointments = [
     {
@@ -48,221 +38,98 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Title
-            const Text(
-              'Appointments',
-              style: TextStyle(
-                color: secondaryDark,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Poppins',
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Schedule your Ayurvedic consultation',
-              style: TextStyle(
-                color: secondaryDark.withOpacity(0.7),
-                fontSize: 16,
-                fontFamily: 'Poppins',
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Calendar Section
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: pureWhite,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: secondaryDark.withOpacity(0.1),
-                  width: 1,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Title
+              const Text(
+                'Appointments',
+                style: TextStyle(
+                  color: secondaryDark,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Poppins',
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Select Date',
-                    style: TextStyle(
-                      color: secondaryDark,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Poppins',
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildCalendar(),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Time Slots Section
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: pureWhite,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: secondaryDark.withOpacity(0.1),
-                  width: 1,
+              const SizedBox(height: 8),
+              Text(
+                'Schedule your Ayurvedic consultation',
+                style: TextStyle(
+                  color: secondaryDark.withOpacity(0.7),
+                  fontSize: 16,
+                  fontFamily: 'Poppins',
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Available Time Slots',
-                    style: TextStyle(
-                      color: secondaryDark,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Poppins',
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTimeSlots(secondaryDark),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
+              const SizedBox(height: 24),
 
-            // Upcoming Appointments
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Your Appointments',
-                    style: TextStyle(
+              // Calendar Section
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: pureWhite,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: secondaryDark.withOpacity(0.1),
+                    width: 1,
+                  ),
+                ),
+                child: TableCalendar(
+                  firstDay: DateTime.utc(2020, 1, 1),
+                  lastDay: DateTime.utc(2030, 12, 31),
+                  focusedDay: _selectedDate,
+                  selectedDayPredicate: (day) {
+                    return isSameDay(_selectedDate, day);
+                  },
+                  onDaySelected: (selectedDay, focusedDay) {
+                    setState(() {
+                      _selectedDate = selectedDay;
+                    });
+                  },
+                  calendarStyle: CalendarStyle(
+                    todayDecoration: BoxDecoration(
+                      color: secondaryDark.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    selectedDecoration: BoxDecoration(
                       color: secondaryDark,
-                      fontSize: 18,
+                      shape: BoxShape.circle,
+                    ),
+                    weekendTextStyle: TextStyle(color: secondaryDark.withOpacity(0.7)),
+                    defaultTextStyle: TextStyle(color: secondaryDark),
+                  ),
+                  headerStyle: HeaderStyle(
+                    formatButtonVisible: false,
+                    titleCentered: true,
+                    titleTextStyle: TextStyle(
+                      color: secondaryDark,
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'Poppins',
+                      fontSize: 16,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: _appointments.isEmpty
-                        ? _buildEmptyState(secondaryDark)
-                        : _buildAppointmentsList(secondaryDark, pureWhite),
-                  ),
-                ],
+                ),
               ),
-            ),
-            const SizedBox(height: 100), // Extra space for floating nav
-          ],
+              const SizedBox(height: 20),
+
+              // Upcoming Appointments
+              const Text(
+                'Your Appointments',
+                style: TextStyle(
+                  color: secondaryDark,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Poppins',
+                ),
+              ),
+              const SizedBox(height: 16),
+              _appointments.isEmpty
+                  ? _buildEmptyState(secondaryDark)
+                  : _buildAppointmentsList(secondaryDark, pureWhite),
+              const SizedBox(height: 100), // Extra space for floating nav
+            ],
+          ),
         ),
       ),
-    );
-  }
-
-  Widget _buildCalendar() {
-    const Color secondaryDark = Color(0xFF0F172A);
-
-    return Container(
-      height: 80,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: 14, // Show next 2 weeks
-        itemBuilder: (context, index) {
-          DateTime date = DateTime.now().add(Duration(days: index));
-          bool isSelected =
-              date.day == _selectedDate.day &&
-              date.month == _selectedDate.month;
-
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedDate = date;
-              });
-            },
-            child: Container(
-              width: 60,
-              margin: const EdgeInsets.only(right: 12),
-              decoration: BoxDecoration(
-                color: isSelected ? primaryTeal : Colors.transparent,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: isSelected
-                      ? primaryTeal
-                      : secondaryDark.withOpacity(0.2),
-                ),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    _getWeekdayName(date.weekday),
-                    style: TextStyle(
-                      color: isSelected
-                          ? Colors.white
-                          : secondaryDark.withOpacity(0.7),
-                      fontSize: 12,
-                      fontFamily: 'Poppins',
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${date.day}',
-                    style: TextStyle(
-                      color: isSelected ? Colors.white : secondaryDark,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Poppins',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildTimeSlots(Color secondaryDark) {
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      children: _timeSlots.asMap().entries.map((entry) {
-        int index = entry.key;
-        String timeSlot = entry.value;
-        bool isSelected = _selectedTimeSlot == index;
-
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              _selectedTimeSlot = index;
-            });
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: isSelected ? primaryTeal : Colors.transparent,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: isSelected
-                    ? primaryTeal
-                    : secondaryDark.withOpacity(0.2),
-              ),
-            ),
-            child: Text(
-              timeSlot,
-              style: TextStyle(
-                color: isSelected ? Colors.white : secondaryDark,
-                fontWeight: FontWeight.w500,
-                fontFamily: 'Poppins',
-              ),
-            ),
-          ),
-        );
-      }).toList(),
     );
   }
 
@@ -332,6 +199,9 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
 
   Widget _buildAppointmentsList(Color secondaryDark, Color pureWhite) {
     return ListView.builder(
+      // Corrected properties
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: _appointments.length,
       itemBuilder: (context, index) {
         final appointment = _appointments[index];
@@ -420,26 +290,5 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
         );
       },
     );
-  }
-
-  String _getWeekdayName(int weekday) {
-    switch (weekday) {
-      case 1:
-        return 'Mon';
-      case 2:
-        return 'Tue';
-      case 3:
-        return 'Wed';
-      case 4:
-        return 'Thu';
-      case 5:
-        return 'Fri';
-      case 6:
-        return 'Sat';
-      case 7:
-        return 'Sun';
-      default:
-        return '';
-    }
   }
 }

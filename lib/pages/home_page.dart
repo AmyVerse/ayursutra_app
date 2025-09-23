@@ -1,5 +1,6 @@
 import 'package:ayursutra_app/pages/appointments_page.dart';
 import 'package:ayursutra_app/pages/profile_page.dart';
+import 'package:ayursutra_app/pages/doctors_detail_page.dart';
 import 'package:ayursutra_app/theme/colors.dart';
 import 'package:flutter/material.dart';
 
@@ -96,7 +97,7 @@ class HomePage extends StatelessWidget {
                         style: TextStyle(
                           color: secondaryDark,
                           fontSize: 22,
-                          fontWeight: FontWeight.bold,
+                          // fontWeight: FontWeight.bold,
                           fontFamily: 'Poppins',
                         ),
                       ),
@@ -348,18 +349,58 @@ class PopularDoctorsSection extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: DoctorCard(
-                name: 'Dr. Priya Nair',
-                specialty: 'Rasayana Specialist',
-                rating: 4.8,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => DoctorDetailScreen(
+                        doctor: Doctor(
+                          name: 'Dr. Priya Nair',
+                          specialization: 'Rasayana Specialist',
+                          biography: 'Expert in Rasayana therapies with 10+ years experience.',
+                          rating: 4,
+                          yearsOfExperience: 10,
+                          patientsChecked: '1200+',
+                          imageUrl: '',
+                          location: 'Delhi',
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                child: DoctorCard(
+                  name: 'Dr. Priya Nair',
+                  specialty: 'Rasayana Specialist',
+                  rating: 4,
+                ),
               ),
             ),
             const SizedBox(width: 16),
             Expanded(
-              child: DoctorCard(
-                name: 'Dr. Vikram Singh',
-                specialty: 'Shalya Tantra',
-                rating: 4.6,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => DoctorDetailScreen(
+                        doctor: Doctor(
+                          name: 'Dr. Vikram Singh',
+                          specialization: 'Shalya Tantra',
+                          biography: 'Specialist in Shalya Tantra with 8+ years experience.',
+                          rating: 4.6,
+                          yearsOfExperience: 8,
+                          patientsChecked: '950+',
+                          imageUrl: '',
+                          location: 'Mumbai',
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                child: DoctorCard(
+                  name: 'Dr. Vikram Singh',
+                  specialty: 'Shalya Tantra',
+                  rating: 4.6,
+                ),
               ),
             ),
           ],
@@ -368,18 +409,58 @@ class PopularDoctorsSection extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: DoctorCard(
-                name: 'Dr. Meera Gupta',
-                specialty: 'Kayachikitsa',
-                rating: 4.7,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => DoctorDetailScreen(
+                        doctor: Doctor(
+                          name: 'Dr. Meera Gupta',
+                          specialization: 'Kayachikitsa',
+                          biography: 'Kayachikitsa expert with 12+ years experience.',
+                          rating: 4.7,
+                          yearsOfExperience: 12,
+                          patientsChecked: '1100+',
+                          imageUrl: '',
+                          location: 'Bangalore',
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                child: DoctorCard(
+                  name: 'Dr. Meera Gupta',
+                  specialty: 'Kayachikitsa',
+                  rating: 4.7,
+                ),
               ),
             ),
             const SizedBox(width: 16),
             Expanded(
-              child: DoctorCard(
-                name: 'Dr. Amit Joshi',
-                specialty: 'Panchakarma',
-                rating: 4.9,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => DoctorDetailScreen(
+                        doctor: Doctor(
+                          name: 'Dr. Amit Joshi',
+                          specialization: 'Panchakarma',
+                          biography: 'Panchakarma specialist with 15+ years experience.',
+                          rating: 5,
+                          yearsOfExperience: 15,
+                          patientsChecked: '1400+',
+                          imageUrl: '',
+                          location: 'Chennai',
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                child: DoctorCard(
+                  name: 'Dr. Amit Joshi',
+                  specialty: 'Panchakarma',
+                  rating: 5,
+                ),
               ),
             ),
           ],
@@ -448,22 +529,13 @@ class DoctorCard extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  for (int i = 0; i < 5; i++)
-                    Icon(
-                      Icons.star,
-                      color: i < rating.floor()
-                          ? Colors.orange
-                          : Colors.grey.withOpacity(0.3),
-                      size: 14,
-                    ),
-                  if (rating % 1 != 0)
-                    Icon(Icons.star_half, color: Colors.orange, size: 14),
+                  ..._buildStarRating(),
                 ],
               ),
               const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: secondaryDark,
                   shape: BoxShape.circle,
                 ),
@@ -478,5 +550,50 @@ class DoctorCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  List<Widget> _buildStarRating() {
+    List<Widget> stars = [];
+    int fullStars = rating.floor();
+    bool hasHalfStar = (rating - fullStars) >= 0.5;
+
+    // Add full stars
+    for (int i = 0; i < fullStars; i++) {
+      stars.add(
+        const Icon(
+          Icons.star,
+          color: Colors.orange,
+          size: 14,
+        ),
+      );
+    }
+
+    // Add half star if applicable
+    if (hasHalfStar) {
+      stars.add(
+        const Icon(
+          Icons.star_half,
+          color: Colors.orange,
+          size: 14,
+        ),
+      );
+    }
+
+    // Add empty stars to complete the 5-star rating
+    int emptyStars = 5 - fullStars;
+    if (hasHalfStar) {
+      emptyStars--;
+    }
+    for (int i = 0; i < emptyStars; i++) {
+      stars.add(
+        Icon(
+          Icons.star_border,
+          color: Colors.grey.withOpacity(0.5),
+          size: 14,
+        ),
+      );
+    }
+
+    return stars;
   }
 }
