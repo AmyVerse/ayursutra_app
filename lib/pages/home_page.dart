@@ -1,4 +1,6 @@
 import 'package:ayursutra_app/pages/appointments_page.dart';
+import 'package:ayursutra_app/pages/profile_page.dart';
+import 'package:ayursutra_app/theme/colors.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
@@ -6,7 +8,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryTeal = Color(0xFF14B8A6);
     const Color secondaryDark = Color(0xFF0F172A);
 
     return SingleChildScrollView(
@@ -17,18 +18,86 @@ class HomePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Custom Header Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // App Title and Profile Row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      const Text(
+                        'AyurSutra',
+                        style: TextStyle(
+                          color: secondaryDark,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            PageRouteBuilder(
+                              transitionDuration: const Duration(
+                                milliseconds: 300,
+                              ),
+                              reverseTransitionDuration: const Duration(
+                                milliseconds: 250,
+                              ),
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) {
+                                    return ProfilePage();
+                                  },
+                              transitionsBuilder:
+                                  (
+                                    context,
+                                    animation,
+                                    secondaryAnimation,
+                                    child,
+                                  ) {
+                                    final offsetAnimation =
+                                        Tween<Offset>(
+                                          begin: const Offset(1.0, 0.0),
+                                          end: Offset.zero,
+                                        ).animate(
+                                          CurvedAnimation(
+                                            parent: animation,
+                                            curve: Curves.easeOut,
+                                          ),
+                                        );
+                                    return SlideTransition(
+                                      position: offsetAnimation,
+                                      child: child,
+                                    );
+                                  },
+                            ),
+                          );
+                        },
+                        child: CircleAvatar(
+                          radius: 25,
+                          backgroundColor: primaryTeal.withOpacity(0.1),
+                          child: const Icon(
+                            Icons.person,
+                            color: primaryTeal,
+                            size: 30,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 30),
+                  // Greeting Section
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Hi Shane 👋',
+                        'Namaste Lokesh 👋',
                         style: TextStyle(
                           color: secondaryDark,
-                          fontSize: 24,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins',
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -37,18 +106,10 @@ class HomePage extends StatelessWidget {
                         style: TextStyle(
                           color: secondaryDark.withOpacity(0.7),
                           fontSize: 16,
+                          fontFamily: 'Poppins',
                         ),
                       ),
                     ],
-                  ),
-                  CircleAvatar(
-                    radius: 25,
-                    backgroundColor: primaryTeal.withOpacity(0.1),
-                    child: const Icon(
-                      Icons.person,
-                      color: primaryTeal,
-                      size: 30,
-                    ),
                   ),
                 ],
               ),
@@ -61,13 +122,14 @@ class HomePage extends StatelessWidget {
                   hintText: 'Search for doctor',
                   hintStyle: TextStyle(
                     color: const Color(0xFF0F172A).withOpacity(0.6),
+                    fontFamily: 'Poppins',
                   ),
                   prefixIcon: const Icon(
                     Icons.search,
                     color: Color(0xFF0F172A),
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
+                    borderRadius: BorderRadius.circular(15.0),
                     borderSide: BorderSide.none,
                   ),
                   filled: true,
@@ -100,7 +162,6 @@ class UpcomingAppointmentsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryTeal = Color(0xFF14B8A6);
     const Color secondaryDark = Color(0xFF0F172A);
     const Color pureWhite = Color(0xFFFFFFFF);
 
@@ -111,11 +172,12 @@ class UpcomingAppointmentsCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              'Upcoming appointment',
+              'Upcoming Appointment',
               style: TextStyle(
                 color: secondaryDark,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                fontFamily: 'Poppins',
               ),
             ),
             TextButton(
@@ -141,7 +203,7 @@ class UpcomingAppointmentsCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(20.0),
           decoration: BoxDecoration(
-            color: secondaryDark,
+            color: const Color.fromARGB(255, 245, 245, 245),
             borderRadius: BorderRadius.circular(20.0),
           ),
           child: Column(
@@ -150,8 +212,12 @@ class UpcomingAppointmentsCard extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundColor: pureWhite.withOpacity(0.2),
-                    child: const Icon(Icons.person, color: pureWhite, size: 30),
+                    backgroundColor: secondaryDark.withOpacity(0.2),
+                    child: const Icon(
+                      Icons.person,
+                      color: secondaryDark,
+                      size: 30,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -159,11 +225,12 @@ class UpcomingAppointmentsCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Dr. Paul Walker',
+                          'Dr. Rajesh Sharma',
                           style: TextStyle(
-                            color: pureWhite,
+                            color: secondaryDark,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
+                            fontFamily: 'Poppins',
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -171,20 +238,28 @@ class UpcomingAppointmentsCard extends StatelessWidget {
                           children: [
                             const Text(
                               '08.30 am',
-                              style: TextStyle(color: pureWhite, fontSize: 14),
+                              style: TextStyle(
+                                color: secondaryDark,
+                                fontSize: 14,
+                                fontFamily: 'Poppins',
+                              ),
                             ),
                             Container(
                               margin: const EdgeInsets.symmetric(horizontal: 8),
                               width: 4,
                               height: 4,
                               decoration: const BoxDecoration(
-                                color: pureWhite,
+                                color: secondaryDark,
                                 shape: BoxShape.circle,
                               ),
                             ),
                             const Text(
-                              'Medicine specialist',
-                              style: TextStyle(color: pureWhite, fontSize: 14),
+                              'Panchakarma Specialist',
+                              style: TextStyle(
+                                color: secondaryDark,
+                                fontSize: 14,
+                                fontFamily: 'Poppins',
+                              ),
                             ),
                           ],
                         ),
@@ -198,18 +273,24 @@ class UpcomingAppointmentsCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Starts in 15 min',
-                    style: TextStyle(color: pureWhite, fontSize: 14),
+                    '25 September 2025',
+                    style: TextStyle(
+                      color: secondaryDark,
+                      fontSize: 14,
+                      fontFamily: 'Poppins',
+                    ),
                   ),
                   ElevatedButton.icon(
                     onPressed: () {
                       // Handle join call action
                     },
-                    icon: const Icon(Icons.videocam, size: 18),
-                    label: const Text('Join the Call'),
+                    label: const Text(
+                      'Expand',
+                      style: TextStyle(fontFamily: 'Poppins'),
+                    ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF9AE6B4), // Light green
-                      foregroundColor: secondaryDark,
+                      backgroundColor: primaryTeal, // Light green
+                      foregroundColor: pureWhite,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 12,
@@ -234,7 +315,6 @@ class PopularDoctorsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryTeal = Color(0xFF14B8A6);
     const Color secondaryDark = Color(0xFF0F172A);
 
     return Column(
@@ -249,6 +329,7 @@ class PopularDoctorsSection extends StatelessWidget {
                 color: secondaryDark,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                fontFamily: 'Poppins',
               ),
             ),
             TextButton(
@@ -268,17 +349,17 @@ class PopularDoctorsSection extends StatelessWidget {
           children: [
             Expanded(
               child: DoctorCard(
-                name: 'Dr. Janie Cooper',
-                specialty: 'Heart specialist',
-                rating: 4.5,
+                name: 'Dr. Priya Nair',
+                specialty: 'Rasayana Specialist',
+                rating: 4.8,
               ),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: DoctorCard(
-                name: 'Dr. Wade Warren',
-                specialty: 'ENT specialist',
-                rating: 4.5,
+                name: 'Dr. Vikram Singh',
+                specialty: 'Shalya Tantra',
+                rating: 4.6,
               ),
             ),
           ],
@@ -288,17 +369,17 @@ class PopularDoctorsSection extends StatelessWidget {
           children: [
             Expanded(
               child: DoctorCard(
-                name: 'Dr. Robert Fox',
-                specialty: 'Dental specialist',
-                rating: 4.0,
+                name: 'Dr. Meera Gupta',
+                specialty: 'Kayachikitsa',
+                rating: 4.7,
               ),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: DoctorCard(
-                name: 'Dr. Kristin Watson',
-                specialty: 'Lung specialist',
-                rating: 4.5,
+                name: 'Dr. Amit Joshi',
+                specialty: 'Panchakarma',
+                rating: 4.9,
               ),
             ),
           ],
@@ -322,7 +403,6 @@ class DoctorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryTeal = Color(0xFF14B8A6);
     const Color secondaryDark = Color(0xFF0F172A);
     const Color pureWhite = Color(0xFFFFFFFF);
 
@@ -347,6 +427,7 @@ class DoctorCard extends StatelessWidget {
               color: secondaryDark,
               fontSize: 14,
               fontWeight: FontWeight.bold,
+              fontFamily: 'Poppins',
             ),
             textAlign: TextAlign.center,
           ),
@@ -356,6 +437,7 @@ class DoctorCard extends StatelessWidget {
             style: TextStyle(
               color: secondaryDark.withOpacity(0.7),
               fontSize: 12,
+              fontFamily: 'Poppins',
             ),
             textAlign: TextAlign.center,
           ),

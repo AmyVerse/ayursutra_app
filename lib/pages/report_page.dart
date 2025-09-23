@@ -1,3 +1,4 @@
+import 'package:ayursutra_app/theme/colors.dart';
 import 'package:flutter/material.dart';
 
 class ReportPage extends StatelessWidget {
@@ -5,7 +6,6 @@ class ReportPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryTeal = Color(0xFF14B8A6);
     const Color secondaryDark = Color(0xFF0F172A);
 
     return SingleChildScrollView(
@@ -22,14 +22,16 @@ class ReportPage extends StatelessWidget {
                   color: secondaryDark,
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
+                  fontFamily: 'Poppins',
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Track your health journey with detailed reports',
+                'Track your Ayurvedic health journey',
                 style: TextStyle(
                   color: secondaryDark.withOpacity(0.7),
                   fontSize: 16,
+                  fontFamily: 'Poppins',
                 ),
               ),
               const SizedBox(height: 24),
@@ -38,27 +40,27 @@ class ReportPage extends StatelessWidget {
               _buildSectionHeader('Recent Reports', 'View all'),
               const SizedBox(height: 16),
               _buildReportCard(
-                title: 'Blood Test Results',
+                title: 'Prakriti Assessment',
                 date: 'Sep 20, 2025',
-                status: 'Normal',
+                status: 'Completed',
                 statusColor: Colors.green,
-                icon: Icons.bloodtype,
+                icon: Icons.psychology,
               ),
               const SizedBox(height: 12),
               _buildReportCard(
-                title: 'Cholesterol Check',
+                title: 'Nadi Pariksha Report',
                 date: 'Sep 15, 2025',
-                status: 'Attention Required',
+                status: 'Review Required',
                 statusColor: Colors.orange,
                 icon: Icons.favorite,
               ),
               const SizedBox(height: 12),
               _buildReportCard(
-                title: 'Blood Pressure Monitor',
+                title: 'Panchakarma Progress',
                 date: 'Sep 10, 2025',
-                status: 'Normal',
-                statusColor: Colors.green,
-                icon: Icons.monitor_heart,
+                status: 'In Progress',
+                statusColor: Colors.blue,
+                icon: Icons.spa,
               ),
               const SizedBox(height: 24),
 
@@ -69,21 +71,21 @@ class ReportPage extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _buildMetricCard(
-                      title: 'BMI',
-                      value: '22.5',
-                      unit: 'kg/m²',
-                      trend: '+0.2',
+                      title: 'Vata Score',
+                      value: '7.2',
+                      unit: '/10',
+                      trend: '+0.3',
                       trendUp: true,
-                      icon: Icons.fitness_center,
+                      icon: Icons.air,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildMetricCard(
-                      title: 'Weight',
-                      value: '68.5',
+                      title: 'Body Weight',
+                      value: '65.5',
                       unit: 'kg',
-                      trend: '-1.2',
+                      trend: '-0.8',
                       trendUp: false,
                       icon: Icons.scale,
                     ),
@@ -95,23 +97,23 @@ class ReportPage extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _buildMetricCard(
-                      title: 'Heart Rate',
-                      value: '72',
-                      unit: 'bpm',
-                      trend: '+3',
+                      title: 'Pitta Score',
+                      value: '6.8',
+                      unit: '/10',
+                      trend: '+0.5',
                       trendUp: true,
-                      icon: Icons.favorite,
+                      icon: Icons.local_fire_department,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildMetricCard(
-                      title: 'Blood Pressure',
-                      value: '120/80',
-                      unit: 'mmHg',
-                      trend: 'Normal',
+                      title: 'Kapha Score',
+                      value: '8.1',
+                      unit: '/10',
+                      trend: 'Balanced',
                       trendUp: null,
-                      icon: Icons.monitor_heart,
+                      icon: Icons.water_drop,
                     ),
                   ),
                 ],
@@ -133,7 +135,7 @@ class ReportPage extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildActionCard(
-                      title: 'Schedule Test',
+                      title: 'Book Assessment',
                       icon: Icons.schedule,
                       color: Colors.blue,
                     ),
@@ -153,7 +155,7 @@ class ReportPage extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildActionCard(
-                      title: 'Export PDF',
+                      title: 'Download PDF',
                       icon: Icons.picture_as_pdf,
                       color: Colors.red,
                     ),
@@ -170,7 +172,6 @@ class ReportPage extends StatelessWidget {
 
   Widget _buildSectionHeader(String title, String actionText) {
     const Color secondaryDark = Color(0xFF0F172A);
-    const Color primaryTeal = Color(0xFF14B8A6);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -181,6 +182,7 @@ class ReportPage extends StatelessWidget {
             color: secondaryDark,
             fontSize: 20,
             fontWeight: FontWeight.bold,
+            fontFamily: 'Poppins',
           ),
         ),
         if (actionText.isNotEmpty)
@@ -243,6 +245,7 @@ class ReportPage extends StatelessWidget {
                     color: secondaryDark,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
+                    fontFamily: 'Poppins',
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -292,7 +295,6 @@ class ReportPage extends StatelessWidget {
   }) {
     const Color pureWhite = Color(0xFFFFFFFF);
     const Color secondaryDark = Color(0xFF0F172A);
-    const Color primaryTeal = Color(0xFF14B8A6);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -323,6 +325,7 @@ class ReportPage extends StatelessWidget {
               color: secondaryDark.withOpacity(0.7),
               fontSize: 14,
               fontWeight: FontWeight.w500,
+              fontFamily: 'Poppins',
             ),
           ),
           const SizedBox(height: 4),

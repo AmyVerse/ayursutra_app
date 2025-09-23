@@ -1,3 +1,4 @@
+import 'package:ayursutra_app/theme/colors.dart';
 import 'package:flutter/material.dart';
 
 class FloatingNavBar extends StatelessWidget {
@@ -12,20 +13,19 @@ class FloatingNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryTeal = Color(0xFF14B8A6);
     const Color secondaryDark = Color(0xFF0F172A);
     const Color pureWhite = Color(0xFFFFFFFF);
 
     return Positioned(
       bottom: 30,
-      left: 20,
-      right: 20,
+      left: 17,
+      right: 17,
       child: Container(
         height: 70,
         decoration: BoxDecoration(
           color: pureWhite,
           borderRadius: BorderRadius.circular(13),
-          border: Border.all(color: secondaryDark, width: 1),
+          border: Border.all(color: secondaryDark, width: 0.5),
           boxShadow: [
             BoxShadow(
               color: secondaryDark.withValues(alpha: 0.15),
@@ -80,8 +80,6 @@ class FloatingNavBar extends StatelessWidget {
   }) {
     const Color pureWhite = Color(0xFFFFFFFF);
     const Color secondaryDark = Color(0xFF0F172A);
-    const Color primaryTeal = Color(0xFF14B8A6);
-
     return Expanded(
       child: GestureDetector(
         onTap: () => onItemTapped(index),

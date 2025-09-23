@@ -1,7 +1,8 @@
-import 'package:ayursutra_app/root.dart';
+import 'package:ayursutra_app/pages/landing_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -28,8 +29,7 @@ class MyApp extends StatelessWidget {
           titleTextStyle: TextStyle(color: secondaryDark),
         ),
       ),
-      home: const RootPage(),
+      home: const LandingPage(),
     );
   }
 }
-

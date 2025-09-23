@@ -1,12 +1,49 @@
+import 'package:ayursutra_app/theme/colors.dart';
 import 'package:flutter/material.dart';
 
-class AppointmentsPage extends StatelessWidget {
+class AppointmentsPage extends StatefulWidget {
   const AppointmentsPage({super.key});
+
+  @override
+  State<AppointmentsPage> createState() => _AppointmentsPageState();
+}
+
+class _AppointmentsPageState extends State<AppointmentsPage> {
+  DateTime _selectedDate = DateTime.now();
+  int _selectedTimeSlot = -1;
+
+  final List<String> _timeSlots = [
+    '09:00 AM',
+    '10:00 AM',
+    '11:00 AM',
+    '12:00 PM',
+    '02:00 PM',
+    '03:00 PM',
+    '04:00 PM',
+    '05:00 PM',
+  ];
+
+  final List<Map<String, dynamic>> _appointments = [
+    {
+      'doctor': 'Dr. Rajesh Sharma',
+      'specialty': 'Panchakarma Specialist',
+      'date': '24 Sep 2025',
+      'time': '10:00 AM',
+      'status': 'upcoming',
+    },
+    {
+      'doctor': 'Dr. Priya Nair',
+      'specialty': 'Panchakarma Specialist',
+      'date': '26 Sep 2025',
+      'time': '03:00 PM',
+      'status': 'confirmed',
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
     const Color secondaryDark = Color(0xFF0F172A);
-    const Color primaryTeal = Color(0xFF14B8A6);
+    const Color pureWhite = Color(0xFFFFFFFF);
 
     return SafeArea(
       child: Padding(
@@ -14,76 +51,108 @@ class AppointmentsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Title
             const Text(
               'Appointments',
               style: TextStyle(
                 color: secondaryDark,
-                fontSize: 24,
+                fontSize: 28,
                 fontWeight: FontWeight.bold,
+                fontFamily: 'Poppins',
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Schedule your Ayurvedic consultation',
+              style: TextStyle(
+                color: secondaryDark.withOpacity(0.7),
+                fontSize: 16,
+                fontFamily: 'Poppins',
               ),
             ),
             const SizedBox(height: 24),
-            Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(32),
-                      decoration: BoxDecoration(
-                        color: primaryTeal.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.calendar_today_rounded,
-                        size: 64,
-                        color: primaryTeal,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    const Text(
-                      'No appointments scheduled',
-                      style: TextStyle(
-                        color: secondaryDark,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Book your first appointment with a doctor',
-                      style: TextStyle(
-                        color: secondaryDark.withOpacity(0.7),
-                        fontSize: 14,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: () {
-                        // Navigate to booking screen
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryTeal,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 32,
-                          vertical: 16,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                      ),
-                      child: const Text(
-                        'Book Appointment',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
+
+            // Calendar Section
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: pureWhite,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: secondaryDark.withOpacity(0.1),
+                  width: 1,
                 ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Select Date',
+                    style: TextStyle(
+                      color: secondaryDark,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildCalendar(),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Time Slots Section
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: pureWhite,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: secondaryDark.withOpacity(0.1),
+                  width: 1,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Available Time Slots',
+                    style: TextStyle(
+                      color: secondaryDark,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildTimeSlots(secondaryDark),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Upcoming Appointments
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Your Appointments',
+                    style: TextStyle(
+                      color: secondaryDark,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: _appointments.isEmpty
+                        ? _buildEmptyState(secondaryDark)
+                        : _buildAppointmentsList(secondaryDark, pureWhite),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 100), // Extra space for floating nav
@@ -91,5 +160,286 @@ class AppointmentsPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildCalendar() {
+    const Color secondaryDark = Color(0xFF0F172A);
+
+    return Container(
+      height: 80,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: 14, // Show next 2 weeks
+        itemBuilder: (context, index) {
+          DateTime date = DateTime.now().add(Duration(days: index));
+          bool isSelected =
+              date.day == _selectedDate.day &&
+              date.month == _selectedDate.month;
+
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                _selectedDate = date;
+              });
+            },
+            child: Container(
+              width: 60,
+              margin: const EdgeInsets.only(right: 12),
+              decoration: BoxDecoration(
+                color: isSelected ? primaryTeal : Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isSelected
+                      ? primaryTeal
+                      : secondaryDark.withOpacity(0.2),
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    _getWeekdayName(date.weekday),
+                    style: TextStyle(
+                      color: isSelected
+                          ? Colors.white
+                          : secondaryDark.withOpacity(0.7),
+                      fontSize: 12,
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${date.day}',
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : secondaryDark,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildTimeSlots(Color secondaryDark) {
+    return Wrap(
+      spacing: 12,
+      runSpacing: 12,
+      children: _timeSlots.asMap().entries.map((entry) {
+        int index = entry.key;
+        String timeSlot = entry.value;
+        bool isSelected = _selectedTimeSlot == index;
+
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              _selectedTimeSlot = index;
+            });
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: isSelected ? primaryTeal : Colors.transparent,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isSelected
+                    ? primaryTeal
+                    : secondaryDark.withOpacity(0.2),
+              ),
+            ),
+            child: Text(
+              timeSlot,
+              style: TextStyle(
+                color: isSelected ? Colors.white : secondaryDark,
+                fontWeight: FontWeight.w500,
+                fontFamily: 'Poppins',
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildEmptyState(Color secondaryDark) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: primaryTeal.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.calendar_today_rounded,
+              size: 64,
+              color: Color(0xFF14B8A6),
+            ),
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'No appointments scheduled',
+            style: TextStyle(
+              color: Color(0xFF0F172A),
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Poppins',
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Book your first consultation with a Vaidya',
+            style: TextStyle(
+              color: secondaryDark.withOpacity(0.7),
+              fontSize: 14,
+              fontFamily: 'Poppins',
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton(
+            onPressed: () {
+              // Book appointment logic
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryTeal,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25),
+              ),
+            ),
+            child: const Text(
+              'Book Consultation',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'Poppins',
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppointmentsList(Color secondaryDark, Color pureWhite) {
+    return ListView.builder(
+      itemCount: _appointments.length,
+      itemBuilder: (context, index) {
+        final appointment = _appointments[index];
+        Color statusColor = appointment['status'] == 'upcoming'
+            ? Colors.orange
+            : primaryTeal;
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: pureWhite,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: secondaryDark.withOpacity(0.1), width: 1),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: statusColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.medical_services,
+                  color: statusColor,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      appointment['doctor'],
+                      style: const TextStyle(
+                        color: Color(0xFF0F172A),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      appointment['specialty'],
+                      style: TextStyle(
+                        color: secondaryDark.withOpacity(0.6),
+                        fontSize: 12,
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${appointment['date']} • ${appointment['time']}',
+                      style: TextStyle(
+                        color: secondaryDark.withOpacity(0.8),
+                        fontSize: 14,
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: statusColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  appointment['status'],
+                  style: TextStyle(
+                    color: statusColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Poppins',
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  String _getWeekdayName(int weekday) {
+    switch (weekday) {
+      case 1:
+        return 'Mon';
+      case 2:
+        return 'Tue';
+      case 3:
+        return 'Wed';
+      case 4:
+        return 'Thu';
+      case 5:
+        return 'Fri';
+      case 6:
+        return 'Sat';
+      case 7:
+        return 'Sun';
+      default:
+        return '';
+    }
   }
 }
