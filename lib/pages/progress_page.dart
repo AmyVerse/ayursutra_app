@@ -1,3 +1,4 @@
+import 'package:ayursutra_app/pages/tridosh_analysis_history_page.dart';
 import 'package:ayursutra_app/theme/colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -84,23 +85,29 @@ class _ProgressPageState extends State<ProgressPage> {
               ),
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "Tridosha Analysis",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
-                          fontFamily: 'Poppins',
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const TridoshAnalysisHistoryPage(),
                         ),
-                      ),
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.info_outline, size: 20),
-                      ),
-                    ],
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Tridosha Analysis",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF0F172A),
+                            fontFamily: 'Poppins',
+                          ),
+                        ),
+                        Icon(Icons.chevron_right, size: 28, color: Color(0xFF0F172A)),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 20),
 
@@ -248,21 +255,19 @@ class _ProgressPageState extends State<ProgressPage> {
                                   fontWeight: FontWeight.bold,
                                   fontFamily: 'Poppins',
                                 );
-                                switch (value.toInt()) {
-                                  case 1:
-                                    return const Text("Mon", style: style);
-                                  case 2:
-                                    return const Text("Tue", style: style);
-                                  case 3:
-                                    return const Text("Wed", style: style);
-                                  case 4:
-                                    return const Text("Thu", style: style);
-                                  case 5:
-                                    return const Text("Fri", style: style);
-                                  default:
-                                    return const SizedBox.shrink();
-                                }
+                                Widget label;
+                                if (value == 1) label = const Text("Mon", style: style);
+                                else if (value == 3) label = const Text("Wed", style: style);
+                                else if (value == 5) label = const Text("Fri", style: style);
+                                else label = const SizedBox.shrink();
+                                // Add vertical offset to x-axis labels
+                                return Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: label,
+                                );
                               },
+                              reservedSize: 40,
+                              interval: 1,
                             ),
                           ),
                           leftTitles: AxisTitles(
@@ -270,18 +275,26 @@ class _ProgressPageState extends State<ProgressPage> {
                               showTitles: true,
                               getTitlesWidget: (value, meta) {
                                 if (value % 20 == 0) {
-                                  return Text(
-                                    "${value.toInt()}%",
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF0F172A),
-                                      fontFamily: 'Poppins',
+                                  return Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: Text(
+                                      "${value.toInt()}%",
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF0F172A),
+                                        fontFamily: 'Poppins',
+                                        height: 1.0, // Prevents line breaks
+                                        overflow: TextOverflow.visible,
+                                      ),
+                                      maxLines: 1,
+                                      softWrap: false,
                                     ),
                                   );
                                 }
                                 return const SizedBox.shrink();
                               },
+                              reservedSize: 40,
                             ),
                           ),
                           topTitles: const AxisTitles(
@@ -367,7 +380,7 @@ class _ProgressPageState extends State<ProgressPage> {
                       LineChartData(
                         minX: 1,
                         maxX: 7,
-                        minY: 50,
+                        minY: 0,
                         maxY: 100,
                         gridData: const FlGridData(
                           show: true,
@@ -384,25 +397,19 @@ class _ProgressPageState extends State<ProgressPage> {
                                   fontWeight: FontWeight.bold,
                                   fontFamily: 'Poppins',
                                 );
-                                switch (value.toInt()) {
-                                  case 1:
-                                    return const Text("Mon", style: style);
-                                  case 2:
-                                    return const Text("Tue", style: style);
-                                  case 3:
-                                    return const Text("Wed", style: style);
-                                  case 4:
-                                    return const Text("Thu", style: style);
-                                  case 5:
-                                    return const Text("Fri", style: style);
-                                  case 6:
-                                    return const Text("Sat", style: style);
-                                  case 7:
-                                    return const Text("Sun", style: style);
-                                  default:
-                                    return const SizedBox.shrink();
-                                }
+                                Widget label;
+                                if (value == 1) label = const Text("Mon", style: style);
+                                else if (value == 4) label = const Text("Thu", style: style);
+                                else if (value == 7) label = const Text("Sun", style: style);
+                                else label = const SizedBox.shrink();
+                                // Add vertical offset to x-axis labels
+                                return Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: label,
+                                );
                               },
+                              reservedSize: 40,
+                              interval: 1,
                             ),
                           ),
                           leftTitles: AxisTitles(
@@ -410,18 +417,26 @@ class _ProgressPageState extends State<ProgressPage> {
                               showTitles: true,
                               getTitlesWidget: (value, meta) {
                                 if (value % 10 == 0) {
-                                  return Text(
-                                    "${value.toInt()}%",
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF0F172A),
-                                      fontFamily: 'Poppins',
+                                  return Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: Text(
+                                      "${value.toInt()}%",
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF0F172A),
+                                        fontFamily: 'Poppins',
+                                        height: 1.0, // Prevents line breaks
+                                        overflow: TextOverflow.visible,
+                                      ),
+                                      maxLines: 1,
+                                      softWrap: false,
                                     ),
                                   );
                                 }
                                 return const SizedBox.shrink();
                               },
+                              reservedSize: 40,
                             ),
                           ),
                           topTitles: const AxisTitles(
