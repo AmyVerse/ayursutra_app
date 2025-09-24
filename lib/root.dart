@@ -37,7 +37,6 @@ class _RootPageState extends State<RootPage> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      // If navigating to Home, increment counter to force a remount/rebuild
       if (index == 0) _homeRefreshCounter++;
     });
   }
