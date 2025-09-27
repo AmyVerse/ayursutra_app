@@ -136,7 +136,7 @@ class _ProgressPageState extends State<ProgressPage> {
                                   ),
                                 ),
                               ),
-                              Container(
+                              SizedBox(
                                 width: 80,
                                 height: 80,
                                 child: CircularProgressIndicator(
@@ -148,7 +148,7 @@ class _ProgressPageState extends State<ProgressPage> {
                                   ),
                                 ),
                               ),
-                              Container(
+                              SizedBox(
                                 width: 80,
                                 height: 80,
                                 child: Center(
@@ -256,8 +256,9 @@ class _ProgressPageState extends State<ProgressPage> {
                                   fontFamily: 'Poppins',
                                 );
                                 Widget label;
-                                if (value == 1) label = const Text("Mon", style: style);
-                                else if (value == 3) label = const Text("Wed", style: style);
+                                if (value == 1) {
+                                  label = const Text("Mon", style: style);
+                                } else if (value == 3) label = const Text("Wed", style: style);
                                 else if (value == 5) label = const Text("Fri", style: style);
                                 else label = const SizedBox.shrink();
                                 // Add vertical offset to x-axis labels
@@ -398,8 +399,9 @@ class _ProgressPageState extends State<ProgressPage> {
                                   fontFamily: 'Poppins',
                                 );
                                 Widget label;
-                                if (value == 1) label = const Text("Mon", style: style);
-                                else if (value == 4) label = const Text("Thu", style: style);
+                                if (value == 1) {
+                                  label = const Text("Mon", style: style);
+                                } else if (value == 4) label = const Text("Thu", style: style);
                                 else if (value == 7) label = const Text("Sun", style: style);
                                 else label = const SizedBox.shrink();
                                 // Add vertical offset to x-axis labels
