@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // You'll likely have a Doctor model in a real app.
 // For this example, we'll define a simple one here.
@@ -245,9 +246,101 @@ class DoctorDetailScreen extends StatelessWidget {
                   // Book Appointment Button
                   Center(
                     child: ElevatedButton(
-                      onPressed: () {
-                        // Handle booking appointment logic
-                        print('Book Appointment for ${doctor.name}');
+                      onPressed: () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        String? aadhar = prefs.getString('aadhar_number');
+                        if (aadhar == null || aadhar.trim().isEmpty) {
+                          String enteredAadhar = '';
+                          await showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text('Enter Aadhar Number', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold)),
+                                content: TextField(
+                                  keyboardType: TextInputType.number,
+                                  maxLength: 12,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Aadhar Number',
+                                    counterText: '',
+                                  ),
+                                  onChanged: (value) {
+                                    enteredAadhar = value;
+                                  },
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      if (enteredAadhar.trim().length == 12) {
+                                        Navigator.of(context).pop();
+                                      }
+                                    },
+                                    child: const Text('Confirm', style: TextStyle(fontFamily: 'Poppins', color: Color(0xFF0F172A))),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                          if (enteredAadhar.trim().length == 12) {
+                            await prefs.setString('aadhar_number', enteredAadhar.trim());
+                            aadhar = enteredAadhar.trim();
+                          } else {
+                            // If not valid, do not proceed
+                            return;
+                          }
+                        }
+                        // Save appointment details to SharedPreferences
+                        final now = DateTime.now();
+                        final formattedDate = "${now.day.toString().padLeft(2, '0')}-${now.month.toString().padLeft(2, '0')}-${now.year}";
+                        await prefs.setString('appointment_doctor', doctor.name);
+                        await prefs.setString('appointment_specialization', doctor.specialization);
+                        await prefs.setString('appointment_date', formattedDate);
+                        // Show top notification
+                        final overlay = Overlay.of(context);
+                        final overlayEntry = OverlayEntry(
+                          builder: (context) => Positioned(
+                            top: MediaQuery.of(context).padding.top + 16,
+                            left: 16,
+                            right: 16,
+                            child: Material(
+                              color: Colors.transparent,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFF90EE90),
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.08),
+                                      blurRadius: 8,
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.check_circle, color: Color(0xFF0F172A)),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        'Appointment booked with ${doctor.name}',
+                                        style: const TextStyle(
+                                          color: Color(0xFF0F172A),
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Poppins',
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                        overlay.insert(overlayEntry);
+                        Future.delayed(const Duration(seconds: 2), () {
+                          overlayEntry.remove();
+                        });
+                        Navigator.pop(context); // Go back to home
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryGreen, // Button color

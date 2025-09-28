@@ -26,10 +26,10 @@ class _ProgressPageState extends State<ProgressPage> {
   ];
 
   final List<FlSpot> healthStatusData = [
-    const FlSpot(1, 60),
-    const FlSpot(2, 65),
-    const FlSpot(3, 70),
-    const FlSpot(4, 75),
+    const FlSpot(1, 10),
+    const FlSpot(2, 25),
+    const FlSpot(3, 50),
+    const FlSpot(4, 65),
     const FlSpot(5, 85),
     const FlSpot(6, 80),
     const FlSpot(7, 88),
@@ -176,15 +176,15 @@ class _ProgressPageState extends State<ProgressPage> {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          Text(
-                            _getDoshDescription(index),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF0F172A).withOpacity(0.6),
-                              fontFamily: 'Poppins',
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                          // Text(
+                          //   _getDoshDescription(index),
+                          //   style: TextStyle(
+                          //     fontSize: 12,
+                          //     color: Color(0xFF0F172A).withOpacity(0.6),
+                          //     fontFamily: 'Poppins',
+                          //   ),
+                          //   textAlign: TextAlign.center,
+                          // ),
                         ],
                       );
                     }),
@@ -214,7 +214,7 @@ class _ProgressPageState extends State<ProgressPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    "Weekly Wellness Trend",
+                    "Overall Progress",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -356,7 +356,7 @@ class _ProgressPageState extends State<ProgressPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    "Overall Health Status",
+                    "Therapy Progress",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -366,7 +366,7 @@ class _ProgressPageState extends State<ProgressPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Your health progress over the past week",
+                    "Your health progress for the Therapy : Vaman",
                     style: TextStyle(
                       fontSize: 14,
                       color: const Color(0xFF0F172A).withOpacity(0.6),
@@ -485,30 +485,7 @@ class _ProgressPageState extends State<ProgressPage> {
 
                   const SizedBox(height: 16),
 
-                  // Health Status Indicators
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildHealthIndicator(
-                        "Energy Level",
-                        "88%",
-                        const Color(0xFF27AE60),
-                        Icons.battery_charging_full,
-                      ),
-                      _buildHealthIndicator(
-                        "Sleep Quality",
-                        "75%",
-                        const Color(0xFF3498DB),
-                        Icons.bedtime,
-                      ),
-                      _buildHealthIndicator(
-                        "Stress Level",
-                        "Low",
-                        const Color(0xFFE67E22),
-                        Icons.psychology,
-                      ),
-                    ],
-                  ),
+                  
                 ],
               ),
             ),
@@ -520,56 +497,57 @@ class _ProgressPageState extends State<ProgressPage> {
     );
   }
 
-  Widget _buildHealthIndicator(
-    String title,
-    String value,
-    Color color,
-    IconData icon,
-  ) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, color: color, size: 24),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 12,
-            color: const Color(0xFF0F172A).withOpacity(0.7),
-            fontFamily: 'Poppins',
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: color,
-            fontFamily: 'Poppins',
-          ),
-        ),
-      ],
-    );
-  }
+//   Widget _buildHealthIndicator(
+//     String title,
+//     String value,
+//     Color color,
+//     IconData icon,
+//   ) {
+//     return Column(
+//       children: [
+//         Container(
+//           padding: const EdgeInsets.all(12),
+//           decoration: BoxDecoration(
+//             color: color.withOpacity(0.1),
+//             borderRadius: BorderRadius.circular(12),
+//           ),
+//           child: Icon(icon, color: color, size: 24),
+//         ),
+//         const SizedBox(height: 8),
+//         Text(
+//           title,
+//           style: TextStyle(
+//             fontSize: 12,
+//             color: const Color(0xFF0F172A).withOpacity(0.7),
+//             fontFamily: 'Poppins',
+//           ),
+//           textAlign: TextAlign.center,
+//         ),
+//         const SizedBox(height: 4),
+//         Text(
+//           value,
+//           style: TextStyle(
+//             fontSize: 14,
+//             fontWeight: FontWeight.bold,
+//             color: color,
+//             fontFamily: 'Poppins',
+//           ),
+//         ),
+//       ],
+//     );
+//   }
 
-  String _getDoshDescription(int index) {
-    switch (index) {
-      case 0:
-        return "Movement\n& Energy";
-      case 1:
-        return "Metabolism\n& Fire";
-      case 2:
-        return "Structure\n& Stability";
-      default:
-        return "";
-    }
-  }
+//   String _getDoshDescription(int index) {
+//     switch (index) {
+//       case 0:
+//         return "Movement\n& Energy";
+//       case 1:
+//         return "Metabolism\n& Fire";
+//       case 2:
+//         return "Structure\n& Stability";
+//       default:
+//         return "";
+//     }
+//   }
+// }
 }

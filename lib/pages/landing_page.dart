@@ -1,5 +1,5 @@
 import 'package:ayursutra_app/doctor/doctor_root.dart';
-import 'package:ayursutra_app/root.dart';
+import 'package:ayursutra_app/onboarding/onboarding_entry.dart';
 import 'package:ayursutra_app/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -100,7 +100,7 @@ class LandingPage extends StatelessWidget {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const RootPage(),
+                                builder: (_) => const OnboardingEntry(),
                               ),
                             );
                           },
