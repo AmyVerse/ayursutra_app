@@ -1,7 +1,9 @@
+import 'package:ayursutra_app/pages/landing_page.dart';
 import 'package:ayursutra_app/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ayursutra_app/pages/landing_page.dart';
+
+import '../services/auth_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -22,6 +24,11 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _notifPhone = false;
   bool _notifExpanded = false;
 
+  // User object from API
+  User? _user;
+  final AuthService _authService = AuthService();
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -29,11 +36,32 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _loadProfile() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Load API user data
+    try {
+      final user = await _authService.getUserDetails();
+      if (user != null) {
+        setState(() {
+          _user = user;
+          _patientName = user.name ?? 'Patient';
+        });
+      }
+    } catch (e) {
+      print('Error loading user details: $e');
+    }
+
+    // Load local preferences as fallback
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _patientName = prefs.getString('patient_name') ?? 'Patient';
+      if (_patientName.isEmpty) {
+        _patientName = 'Patient';
+      }
       _age = prefs.getString('patient_age') ?? '';
       _aadhar = prefs.getString('aadhar_number') ?? '';
+      _isLoading = false;
     });
   }
 
@@ -70,10 +98,13 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Profile Card (only name)
+              // Profile Card with user information
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 18,
+                  horizontal: 18,
+                ),
                 decoration: BoxDecoration(
                   color: cardBg,
                   borderRadius: BorderRadius.circular(18),
@@ -84,33 +115,74 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ],
                 ),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 28,
-                      backgroundColor: secondaryDark.withOpacity(0.08),
-                      child: const Icon(Icons.person, color: secondaryDark, size: 32),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                child: _isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(color: primaryTeal),
+                      )
+                    : Row(
                         children: [
-                          Text(_patientName, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Poppins')),
-                          const SizedBox(height: 4),
-                          Text('AyurSutra ID: AYR123456', style: TextStyle(fontSize: 15, color: secondaryDark.withOpacity(0.7), fontFamily: 'Poppins')),
+                          CircleAvatar(
+                            radius: 28,
+                            backgroundColor: secondaryDark.withOpacity(0.08),
+                            child: const Icon(
+                              Icons.person,
+                              color: secondaryDark,
+                              size: 32,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _user?.name ?? _patientName,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Poppins',
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'AyurSutra ID: ${_user?.ayursutraId ?? 'AYR123456'}',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: secondaryDark.withOpacity(0.7),
+                                    fontFamily: 'Poppins',
+                                  ),
+                                ),
+                                if (_user?.email != null) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    _user!.email!,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: secondaryDark.withOpacity(0.7),
+                                      fontFamily: 'Poppins',
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
                         ],
                       ),
-                    ),
-                  ],
-                ),
               ),
               const SizedBox(height: 24),
 
               // Info Container for Age, Aadhar, and Tridosh Analysis
               Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 18, 0),
-                child: Text('Info', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22, fontFamily: 'Poppins', color: primaryTeal)),
+                child: Text(
+                  'Info',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 22,
+                    fontFamily: 'Poppins',
+                    color: primaryTeal,
+                  ),
+                ),
               ),
               const SizedBox(height: 12),
               Container(
@@ -126,7 +198,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   ],
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 18.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18.0,
+                    vertical: 18.0,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -134,8 +209,23 @@ class _ProfilePageState extends State<ProfilePage> {
                         children: [
                           Icon(Icons.cake, color: primaryTeal),
                           const SizedBox(width: 8),
-                          Text('Age: ', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600, fontSize: 18, color: Color(0xFF0F172A))),
-                          Text(_age.isNotEmpty ? _age : '--', style: TextStyle(fontFamily: 'Poppins', fontSize: 16, color: Color(0xFF0F172A))),
+                          Text(
+                            'Age: ',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 18,
+                              color: Color(0xFF0F172A),
+                            ),
+                          ),
+                          Text(
+                            _age.isNotEmpty ? _age : '--',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                              color: Color(0xFF0F172A),
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 12),
@@ -143,13 +233,36 @@ class _ProfilePageState extends State<ProfilePage> {
                         children: [
                           Icon(Icons.credit_card, color: primaryTeal),
                           const SizedBox(width: 8),
-                          Text('Aadhar: ', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600, fontSize: 18, color: Color(0xFF0F172A))),
-                          Text(_aadhar.isNotEmpty ? _aadhar : '--', style: TextStyle(fontFamily: 'Poppins', fontSize: 16, color: Color(0xFF0F172A))),
+                          Text(
+                            'Aadhar: ',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 18,
+                              color: Color(0xFF0F172A),
+                            ),
+                          ),
+                          Text(
+                            _aadhar.isNotEmpty ? _aadhar : '--',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                              color: Color(0xFF0F172A),
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 24),
                       // Tridosh Analysis Section
-                      Text('Prakriti', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, fontFamily: 'Poppins', color: Color(0xFF0F172A))),
+                      Text(
+                        'Prakriti',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          fontFamily: 'Poppins',
+                          color: Color(0xFF0F172A),
+                        ),
+                      ),
                       const SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -178,7 +291,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                     width: 60,
                                     height: 60,
                                     child: CircularProgressIndicator(
-                                      value: tridoshValues[index] != null ? tridoshValues[index]! / 100 : 0,
+                                      value: tridoshValues[index] != null
+                                          ? tridoshValues[index]! / 100
+                                          : 0,
                                       strokeWidth: 6,
                                       backgroundColor: Colors.transparent,
                                       valueColor: AlwaysStoppedAnimation<Color>(
@@ -191,7 +306,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                     height: 60,
                                     child: Center(
                                       child: Text(
-                                        tridoshValues[index] != null ? "${tridoshValues[index]}%" : "--",
+                                        tridoshValues[index] != null
+                                            ? "${tridoshValues[index]}%"
+                                            : "--",
                                         style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold,
@@ -226,11 +343,18 @@ class _ProfilePageState extends State<ProfilePage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: primaryTeal,
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32,
+                              vertical: 12,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30.0),
                             ),
-                            textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Poppins'),
+                            textStyle: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Poppins',
+                            ),
                           ),
                           child: const Text('Run Test'),
                         ),
@@ -244,7 +368,15 @@ class _ProfilePageState extends State<ProfilePage> {
               // Settings title OUTSIDE the container
               Padding(
                 padding: const EdgeInsets.fromLTRB(0, 18, 18, 0),
-                child: Text('Settings', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22, fontFamily: 'Poppins', color: primaryTeal)),
+                child: Text(
+                  'Settings',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 22,
+                    fontFamily: 'Poppins',
+                    color: primaryTeal,
+                  ),
+                ),
               ),
               // Notifications section INSIDE the container
               const SizedBox(height: 12),
@@ -270,7 +402,10 @@ class _ProfilePageState extends State<ProfilePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 18.0),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18.0,
+                          vertical: 18.0,
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -278,22 +413,44 @@ class _ProfilePageState extends State<ProfilePage> {
                               children: [
                                 Icon(Icons.notifications, color: primaryTeal),
                                 const SizedBox(width: 8),
-                                const Text('Notifications', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600, fontSize: 20, color: Color(0xFF0F172A))),
+                                const Text(
+                                  'Notifications',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 20,
+                                    color: Color(0xFF0F172A),
+                                  ),
+                                ),
                               ],
                             ),
-                            Icon(_notifExpanded ? Icons.expand_less : Icons.expand_more, color: primaryTeal),
+                            Icon(
+                              _notifExpanded
+                                  ? Icons.expand_less
+                                  : Icons.expand_more,
+                              color: primaryTeal,
+                            ),
                           ],
                         ),
                       ),
                       if (_notifExpanded)
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 8.0),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 18.0,
+                            vertical: 8.0,
+                          ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 children: [
-                                  const Text('In-app', style: TextStyle(fontFamily: 'Poppins', color: Color(0xFF0F172A))),
+                                  const Text(
+                                    'In-app',
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      color: Color(0xFF0F172A),
+                                    ),
+                                  ),
                                   const Spacer(),
                                   Switch(
                                     value: true,
@@ -304,7 +461,13 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               Row(
                                 children: [
-                                  const Text('Email', style: TextStyle(fontFamily: 'Poppins', color: Color(0xFF0F172A))),
+                                  const Text(
+                                    'Email',
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      color: Color(0xFF0F172A),
+                                    ),
+                                  ),
                                   const Spacer(),
                                   Switch(
                                     value: _notifEmail,
@@ -317,7 +480,13 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               Row(
                                 children: [
-                                  const Text('Phone', style: TextStyle(fontFamily: 'Poppins', color: Color(0xFF0F172A))),
+                                  const Text(
+                                    'Phone',
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      color: Color(0xFF0F172A),
+                                    ),
+                                  ),
                                   const Spacer(),
                                   Switch(
                                     value: _notifPhone,
@@ -341,26 +510,42 @@ class _ProfilePageState extends State<ProfilePage> {
               Center(
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.logout),
-                  label: const Text('Log Out', style: TextStyle(fontFamily: 'Poppins')),
+                  label: const Text(
+                    'Log Out',
+                    style: TextStyle(fontFamily: 'Poppins'),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryTeal,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 14,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
-                    textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   onPressed: () async {
+                    // Clear all session data using AuthService
+                    final authService = AuthService();
+                    await authService.logout();
+
+                    // Clear onboarding data
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.remove('appointment_doctor');
                     await prefs.remove('appointment_specialization');
                     await prefs.remove('appointment_date');
-                    await prefs.remove('patient_name');
                     await prefs.remove('patient_age');
                     await prefs.remove('aadhar_number');
+
                     Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => const LandingPage()),
+                      MaterialPageRoute(
+                        builder: (context) => const LandingPage(),
+                      ),
                       (route) => false,
                     );
                   },

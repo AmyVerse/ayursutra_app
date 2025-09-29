@@ -1,11 +1,14 @@
+import 'package:ayursutra_app/models/doctor.dart' as api_model;
 import 'package:ayursutra_app/pages/appointments_page.dart';
-import 'package:ayursutra_app/pages/profile_page.dart';
-import 'package:ayursutra_app/pages/doctors_detail_page.dart';
-import 'package:ayursutra_app/theme/colors.dart';
 import 'package:ayursutra_app/pages/chatbot_page.dart';
 import 'package:ayursutra_app/pages/notification_page.dart';
+import 'package:ayursutra_app/pages/profile_page.dart';
+import 'package:ayursutra_app/screens/doctor_detail_screen.dart' as api_screen;
+import 'package:ayursutra_app/screens/doctor_search_screen.dart';
+import 'package:ayursutra_app/services/auth_service.dart';
+import 'package:ayursutra_app/services/doctor_service.dart';
+import 'package:ayursutra_app/theme/colors.dart';
 import 'package:flutter/material.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,6 +20,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String _patientName = '';
+  User? _user;
+  final AuthService _authService = AuthService();
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -25,9 +31,32 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadPatientName() async {
-    final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _patientName = prefs.getString('patient_name') ?? '';
+      _isLoading = true;
+    });
+
+    // First try to get user details from API
+    try {
+      final user = await _authService.getUserDetails();
+      if (user != null) {
+        setState(() {
+          _user = user;
+          _patientName = user.name ?? '';
+        });
+      }
+    } catch (e) {
+      print('Error loading user details: $e');
+    }
+
+    // If API failed or name is empty, use a default value instead
+    if (_patientName.isEmpty) {
+      setState(() {
+        _patientName = 'Patient';
+      });
+    }
+
+    setState(() {
+      _isLoading = false;
     });
   }
 
@@ -58,7 +87,11 @@ class _HomePageState extends State<HomePage> {
                     Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.notifications_none, color: Color(0xFF0F172A), size: 26),
+                          icon: const Icon(
+                            Icons.notifications_none,
+                            color: Color(0xFF0F172A),
+                            size: 26,
+                          ),
                           onPressed: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
@@ -72,31 +105,38 @@ class _HomePageState extends State<HomePage> {
                           onTap: () {
                             Navigator.of(context).push(
                               PageRouteBuilder(
-                                transitionDuration: const Duration(milliseconds: 300),
-                                reverseTransitionDuration: const Duration(milliseconds: 250),
-                                pageBuilder: (context, animation, secondaryAnimation) {
-                                  return ProfilePage();
-                                },
-                                transitionsBuilder: (
-                                  context,
-                                  animation,
-                                  secondaryAnimation,
-                                  child,
-                                ) {
-                                  final offsetAnimation = Tween<Offset>(
-                                    begin: const Offset(1.0, 0.0),
-                                    end: Offset.zero,
-                                  ).animate(
-                                    CurvedAnimation(
-                                      parent: animation,
-                                      curve: Curves.easeOut,
-                                    ),
-                                  );
-                                  return SlideTransition(
-                                    position: offsetAnimation,
-                                    child: child,
-                                  );
-                                },
+                                transitionDuration: const Duration(
+                                  milliseconds: 300,
+                                ),
+                                reverseTransitionDuration: const Duration(
+                                  milliseconds: 250,
+                                ),
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) {
+                                      return ProfilePage();
+                                    },
+                                transitionsBuilder:
+                                    (
+                                      context,
+                                      animation,
+                                      secondaryAnimation,
+                                      child,
+                                    ) {
+                                      final offsetAnimation =
+                                          Tween<Offset>(
+                                            begin: const Offset(1.0, 0.0),
+                                            end: Offset.zero,
+                                          ).animate(
+                                            CurvedAnimation(
+                                              parent: animation,
+                                              curve: Curves.easeOut,
+                                            ),
+                                          );
+                                      return SlideTransition(
+                                        position: offsetAnimation,
+                                        child: child,
+                                      );
+                                    },
                               ),
                             );
                           },
@@ -116,14 +156,23 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(height: 30),
                 // Greeting Section
-                Text(
-                  'Namaste ${_patientName.isNotEmpty ? _patientName : 'Patient'} 👋',
-                  style: const TextStyle(
-                    color: Color(0xFF0F172A),
-                    fontSize: 22,
-                    fontFamily: 'Poppins',
-                  ),
-                ),
+                _isLoading
+                    ? const SizedBox(
+                        height: 30,
+                        width: 30,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: primaryTeal,
+                        ),
+                      )
+                    : Text(
+                        'Namaste ${_user?.name ?? (_patientName.isNotEmpty ? _patientName : 'Patient')} 👋',
+                        style: const TextStyle(
+                          color: Color(0xFF0F172A),
+                          fontSize: 22,
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
                 const SizedBox(height: 4),
                 Text(
                   'How is your health!',
@@ -138,27 +187,39 @@ class _HomePageState extends State<HomePage> {
                 Row(
                   children: [
                     Expanded(
-                      child: TextField(
-                        style: const TextStyle(color: Color(0xFF0F172A)),
-                        decoration: InputDecoration(
-                          hintText: 'Search for doctor',
-                          hintStyle: TextStyle(
-                            color: const Color(0xFF0F172A).withOpacity(0.6),
-                            fontFamily: 'Poppins',
-                          ),
-                          prefixIcon: const Icon(
-                            Icons.search,
-                            color: Color(0xFF0F172A),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15.0),
-                            borderSide: BorderSide.none,
-                          ),
-                          filled: true,
-                          fillColor: const Color(0xFF0F172A).withOpacity(0.05),
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 0,
-                            horizontal: 20,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => DoctorSearchScreen(),
+                            ),
+                          );
+                        },
+                        child: TextField(
+                          enabled: false, // Disable direct input
+                          style: const TextStyle(color: Color(0xFF0F172A)),
+                          decoration: InputDecoration(
+                            hintText: 'Search for doctor',
+                            hintStyle: TextStyle(
+                              color: const Color(0xFF0F172A).withOpacity(0.6),
+                              fontFamily: 'Poppins',
+                            ),
+                            prefixIcon: const Icon(
+                              Icons.search,
+                              color: Color(0xFF0F172A),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                              borderSide: BorderSide.none,
+                            ),
+                            filled: true,
+                            fillColor: const Color(
+                              0xFF0F172A,
+                            ).withOpacity(0.05),
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 0,
+                              horizontal: 20,
+                            ),
                           ),
                         ),
                       ),
@@ -208,13 +269,14 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-  }
+}
 
 class UpcomingAppointmentsCard extends StatefulWidget {
   const UpcomingAppointmentsCard({super.key});
 
   @override
-  State<UpcomingAppointmentsCard> createState() => _UpcomingAppointmentsCardState();
+  State<UpcomingAppointmentsCard> createState() =>
+      _UpcomingAppointmentsCardState();
 }
 
 class _UpcomingAppointmentsCardState extends State<UpcomingAppointmentsCard> {
@@ -286,7 +348,11 @@ class _UpcomingAppointmentsCardState extends State<UpcomingAppointmentsCard> {
           child: noAppointment
               ? Column(
                   children: [
-                    Icon(Icons.event_busy, color: secondaryDark.withOpacity(0.3), size: 48),
+                    Icon(
+                      Icons.event_busy,
+                      color: secondaryDark.withOpacity(0.3),
+                      size: 48,
+                    ),
                     const SizedBox(height: 12),
                     Text(
                       'No appointments yet',
@@ -357,8 +423,80 @@ class _UpcomingAppointmentsCardState extends State<UpcomingAppointmentsCard> {
   }
 }
 
-class PopularDoctorsSection extends StatelessWidget {
+class PopularDoctorsSection extends StatefulWidget {
   const PopularDoctorsSection({super.key});
+
+  @override
+  State<PopularDoctorsSection> createState() => _PopularDoctorsSectionState();
+}
+
+class _PopularDoctorsSectionState extends State<PopularDoctorsSection> {
+  final DoctorService _doctorService = DoctorService();
+  List<api_model.Doctor> _doctors = [];
+  bool _isLoading = true;
+  bool _hasError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDoctors();
+  }
+
+  Future<void> _loadDoctors() async {
+    try {
+      final doctors = await _doctorService.searchDoctors();
+      setState(() {
+        _doctors = doctors.take(4).toList(); // Get the first 4 doctors
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading doctors: $e');
+      setState(() {
+        _isLoading = false;
+        _hasError = true;
+      });
+    }
+  }
+
+  Widget _buildDoctorGrid() {
+    return Column(
+      children: [
+        for (int i = 0; i < _doctors.length; i += 2)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Row(
+              children: [
+                Expanded(child: _buildDoctorCard(_doctors[i])),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: i + 1 < _doctors.length
+                      ? _buildDoctorCard(_doctors[i + 1])
+                      : Container(), // Empty container for odd number of doctors
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildDoctorCard(api_model.Doctor doctor) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) =>
+                api_screen.DoctorDetailScreen(doctorId: doctor.id),
+          ),
+        );
+      },
+      child: DoctorCard(
+        name: doctor.name,
+        specialty: doctor.specialization,
+        rating: double.tryParse(doctor.rating) ?? 0.0,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -380,7 +518,15 @@ class PopularDoctorsSection extends StatelessWidget {
               ),
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                // Navigate to doctor search screen with proper initialization
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => DoctorSearchScreen(),
+                    settings: const RouteSettings(name: 'DoctorSearchScreen'),
+                  ),
+                );
+              },
               child: const Text(
                 'View all',
                 style: TextStyle(
@@ -392,125 +538,25 @@ class PopularDoctorsSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => DoctorDetailScreen(
-                        doctor: Doctor(
-                          name: 'Dr. Priya Nair',
-                          specialization: 'Rasayana Specialist',
-                          biography: 'Expert in Rasayana therapies with 10+ years experience.',
-                          rating: 4,
-                          yearsOfExperience: 10,
-                          patientsChecked: '1200+',
-                          imageUrl: '',
-                          location: 'Delhi',
-                        ),
-                      ),
+        _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _hasError
+            ? Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.red),
+                    const SizedBox(height: 8),
+                    const Text('Failed to load doctors'),
+                    TextButton(
+                      onPressed: _loadDoctors,
+                      child: const Text('Retry'),
                     ),
-                  );
-                },
-                child: DoctorCard(
-                  name: 'Dr. Priya Nair',
-                  specialty: 'Rasayana Specialist',
-                  rating: 4,
+                  ],
                 ),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => DoctorDetailScreen(
-                        doctor: Doctor(
-                          name: 'Dr. Vikram Singh',
-                          specialization: 'Shalya Tantra',
-                          biography: 'Specialist in Shalya Tantra with 8+ years experience.',
-                          rating: 4.6,
-                          yearsOfExperience: 8,
-                          patientsChecked: '950+',
-                          imageUrl: '',
-                          location: 'Mumbai',
-                        ),
-                      ),
-                    ),
-                  );
-                },
-                child: DoctorCard(
-                  name: 'Dr. Vikram Singh',
-                  specialty: 'Shalya Tantra',
-                  rating: 4.6,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => DoctorDetailScreen(
-                        doctor: Doctor(
-                          name: 'Dr. Meera Gupta',
-                          specialization: 'Kayachikitsa',
-                          biography: 'Kayachikitsa expert with 12+ years experience.',
-                          rating: 4.7,
-                          yearsOfExperience: 12,
-                          patientsChecked: '1100+',
-                          imageUrl: '',
-                          location: 'Bangalore',
-                        ),
-                      ),
-                    ),
-                  );
-                },
-                child: DoctorCard(
-                  name: 'Dr. Meera Gupta',
-                  specialty: 'Kayachikitsa',
-                  rating: 4.7,
-                ),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => DoctorDetailScreen(
-                        doctor: Doctor(
-                          name: 'Dr. Amit Joshi',
-                          specialization: 'Panchakarma',
-                          biography: 'Panchakarma specialist with 15+ years experience.',
-                          rating: 5,
-                          yearsOfExperience: 15,
-                          patientsChecked: '1400+',
-                          imageUrl: '',
-                          location: 'Chennai',
-                        ),
-                      ),
-                    ),
-                  );
-                },
-                child: DoctorCard(
-                  name: 'Dr. Amit Joshi',
-                  specialty: 'Panchakarma',
-                  rating: 5,
-                ),
-              ),
-            ),
-          ],
-        ),
+              )
+            : _doctors.isEmpty
+            ? const Center(child: Text('No doctors available'))
+            : _buildDoctorGrid(),
       ],
     );
   }
@@ -574,9 +620,7 @@ class DoctorCard extends StatelessWidget {
             children: [
               Row(
                 mainAxisSize: MainAxisSize.min,
-                children: [
-                  ..._buildStarRating(),
-                ],
+                children: [..._buildStarRating()],
               ),
               const SizedBox(width: 8),
               Container(
@@ -605,24 +649,12 @@ class DoctorCard extends StatelessWidget {
 
     // Add full stars
     for (int i = 0; i < fullStars; i++) {
-      stars.add(
-        const Icon(
-          Icons.star,
-          color: Colors.orange,
-          size: 14,
-        ),
-      );
+      stars.add(const Icon(Icons.star, color: Colors.orange, size: 14));
     }
 
     // Add half star if applicable
     if (hasHalfStar) {
-      stars.add(
-        const Icon(
-          Icons.star_half,
-          color: Colors.orange,
-          size: 14,
-        ),
-      );
+      stars.add(const Icon(Icons.star_half, color: Colors.orange, size: 14));
     }
 
     // Add empty stars to complete the 5-star rating
@@ -632,11 +664,7 @@ class DoctorCard extends StatelessWidget {
     }
     for (int i = 0; i < emptyStars; i++) {
       stars.add(
-        Icon(
-          Icons.star_border,
-          color: Colors.grey.withOpacity(0.5),
-          size: 14,
-        ),
+        Icon(Icons.star_border, color: Colors.grey.withOpacity(0.5), size: 14),
       );
     }
 
